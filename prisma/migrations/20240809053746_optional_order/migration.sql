@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "order" ALTER COLUMN "discount" DROP NOT NULL,
+ALTER COLUMN "rating" DROP NOT NULL,
+ALTER COLUMN "review" DROP NOT NULL;

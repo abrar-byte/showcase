@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(cuid())
+  created_at DateTime   @default(now())
+  email      String     @unique
+  fullname   String?
+  image      String?
+  active     Boolean    @default(true)
+  role       USER_ROLE  @default(USER)
+  Order      Order[]
+  Favorite   Favorite[]
+
+  @@map("user")
+}
+
+model Garage {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  location    String
+  active      Boolean @default(true)
+  Car         Car[]
+
+  @@map("garage")
+}
+
+model Car {
+  id              Int        @id @default(autoincrement())
+  created_at      DateTime   @default(now())
+  garage          Garage     @relation(fields: [garage_id], references: [id])
+  garage_id       Int
+  plate           String
+  name            String
+  description     String?
+  amount          Float
+  discount        Float?
+  gasoline        Float?
+  capacity        Int
+  type            String
+  steering        String
+  active          Boolean    @default(true)
+  inactive_at     DateTime?
+  inactive_reason String?
+  can_drop_off    Boolean    @default(false)
+  CarMedia        CarMedia[]
+  Order           Order[]
+  Favorite        Favorite[]
+
+  @@map("car")
+}
+
+model CarMedia {
+  id     String  @id @default(cuid())
+  car    Car     @relation(fields: [car_id], references: [id], onDelete: Cascade)
+  car_id Int
+  name   String?
+  link   String
+  type   String?
+  cover  Boolean @default(false)
+
+  @@map("car_media")
+}
+
+model Order {
+  id                   String       @id @default(cuid())
+  created_at           DateTime     @default(now())
+  start_date           DateTime
+  end_date             DateTime
+  user                 User         @relation(fields: [user_id], references: [id])
+  user_id              String
+  car                  Car          @relation(fields: [car_id], references: [id])
+  car_id               Int
+  cust_name            String?
+  cust_phone           String?
+  cust_address         String?
+  cust_city            String?
+  car_name             String?
+  amount               Float?
+  discount             Float?
+  total                Float?
+  note                 String?
+  drop_off             Boolean?     @default(false)
+  drop_location        String?
+  rating               Int?
+  review               String?
+  review_at            DateTime?
+  paid_at              DateTime?
+  s_payment_intent_id  String?
+  s_customer_id        String?
+  s_invoice_id         String?
+  s_hosted_invoice_url String?
+  status               ORDER_STATUS @default(CHECKOUT)
+
+  @@map("order")
+}
+
+model Favorite {
+  id         String   @id @default(uuid())
+  created_at DateTime @default(now())
+  car        Car      @relation(fields: [car_id], references: [id], onDelete: Cascade)
+  car_id     Int
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String
+
+  @@map("favorite")
+}
+
+enum USER_ROLE {
+  USER
+  ADMIN
+}
+
+enum ORDER_STATUS {
+  CHECKOUT
+  PAID
+  ON_GOING
+  COMPLETED
+}

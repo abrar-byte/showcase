@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "ORDER_STATUS" ADD VALUE 'CHECKOUT';
+
+-- AlterTable
+ALTER TABLE "order" ADD COLUMN     "review_at" TIMESTAMP(3);
